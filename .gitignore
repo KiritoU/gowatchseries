@@ -1,0 +1,8 @@
+venv
+soup
+.vscode
+__pycache__
+
+settings.py
+test*
+admin
