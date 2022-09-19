@@ -19,6 +19,16 @@ class Database:
             print(f"Error connecting to MariaDB Platform: {e}")
             sys.exit(1)
 
+    def select_with(self, query: str) -> list:
+        conn = self.get_conn()
+        cur = conn.cursor()
+        cur.execute(query)
+        res = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        return res
+
     def select_all_from(self, table: str, condition: str = "1=1", cols: str = "*"):
         conn = self.get_conn()
         cur = conn.cursor()

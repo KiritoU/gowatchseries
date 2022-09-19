@@ -166,6 +166,8 @@ class Helper:
                 data=pmeta,
             )
 
+        database.insert_into(table="term_relationships", data=(postId, 13853, 0))
+
         return postId
 
 
