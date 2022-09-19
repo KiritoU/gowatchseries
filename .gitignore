@@ -8,3 +8,5 @@ test*
 admin
 
 wp-content
+
+log/*
