@@ -21,7 +21,7 @@ def main():
     query = "SELECT p.ID FROM `ODJiM2_term_relationships` tr, ODJiM2_posts p WHERE p.ID=tr.object_id AND p.post_type='post' AND tr.term_taxonomy_id=13853"
     post_ids = database.select_with(query)
     print(post_ids)
-    # post_ids = [x[0] for x in post_ids]
+    post_ids = [x[0] for x in post_ids]
 
     # for post_id in post_ids:
     #     database.delete_from(
