@@ -6,3 +6,5 @@ __pycache__
 settings.py
 test*
 admin
+
+wp-content
