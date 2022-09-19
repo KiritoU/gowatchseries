@@ -35,7 +35,7 @@ class Helper:
         return requests.get(url, headers=self.get_header())
 
     def format_text(self, text: str) -> str:
-        return text.strip().strip("\n")
+        return text.strip().strip("\n").replace("'", "''")
 
     def get_timeupdate(self) -> str:
         # TODO: later
