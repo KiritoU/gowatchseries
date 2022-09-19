@@ -98,6 +98,12 @@ class Helper:
         return thumbId
 
     def insert_movie(self, movie_details: dict, post_type: str = "post"):
+        isMovieExists = database.select_all_from(
+            table="posts", condition=f"post_title='{movie_details['name']}'"
+        )
+        if isMovieExists:
+            return
+
         thumbId = self.insert_thumb(movie_details["picture"])
         timeupdate = self.get_timeupdate()
         data = (
