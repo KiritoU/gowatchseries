@@ -243,6 +243,7 @@ class Helper:
         print(
             movie_details["genre"], movie_details["country"], movie_details["released"]
         )
+        print(postmetas)
         for pmeta in postmetas:
             print(f"Inserting postmeta: {pmeta}")
             database.insert_into(
