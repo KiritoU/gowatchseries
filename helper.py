@@ -232,15 +232,18 @@ class Helper:
             (postId, "_film_type", "field_630ecf331b56c"),
             (postId, "_", "field_630ecf4b1b56d"),
             (postId, "post_views_count", "0"),
-            (postId, "genre", movie_details["genre"]),
             (postId, "_genre", "field_62eb4674d417d"),
-            (postId, "country", movie_details["country"]),
             (postId, "_country", "field_60187b7c9c230"),
-            (postId, "released", movie_details["released"]),
             (postId, "_released", "field_62e7989914215"),
         ]
 
         print((postId, "genre", movie_details["genre"]))
+        postmetas.append((postId, "genre", movie_details["genre"]))
+        print((postId, "genre", movie_details["country"]))
+        postmetas.append((postId, "country", movie_details["country"]))
+        print((postId, "genre", movie_details["released"]))
+        postmetas.append((postId, "released", movie_details["released"]))
+
         print(postmetas)
         for pmeta in postmetas:
             print(f"Inserting postmeta: {pmeta}")
