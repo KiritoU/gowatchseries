@@ -1,7 +1,7 @@
 import logging
 
 from bs4 import BeautifulSoup
-
+from time import sleep
 
 from settings import CONFIG
 from helper import helper
@@ -60,6 +60,8 @@ class Crawler:
                 }
 
                 movie_details = {**movie_details, **self.get_movie_details(href)}
+                print(movie_details)
+                sleep(10)
                 helper.insert_movie(movie_details)
 
         except Exception as e:
