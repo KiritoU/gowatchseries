@@ -240,9 +240,7 @@ class Helper:
             (postId, "_released", "field_62e7989914215"),
         ]
 
-        print(
-            movie_details["genre"], movie_details["country"], movie_details["released"]
-        )
+        print((postId, "genre", movie_details["genre"]))
         print(postmetas)
         for pmeta in postmetas:
             print(f"Inserting postmeta: {pmeta}")
