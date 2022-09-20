@@ -170,6 +170,7 @@ class Helper:
         return thumbId
 
     def insert_movie(self, movie_details: dict, post_type: str = "post"):
+        print(movie_details)
         movie_name = movie_details["name"].replace("'", "''")
         isMovieExists = database.select_all_from(
             table="posts", condition=f"post_title='{movie_name}'"
