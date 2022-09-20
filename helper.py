@@ -35,7 +35,7 @@ class Helper:
         return requests.get(url, headers=self.get_header())
 
     def format_text(self, text: str) -> str:
-        return text.strip().strip("\n").replace("'", "''")
+        return text.strip().strip("\n")
 
     def get_timeupdate(self) -> str:
         # TODO: later
@@ -98,8 +98,9 @@ class Helper:
         return thumbId
 
     def insert_movie(self, movie_details: dict, post_type: str = "post"):
+        movie_name = movie_details["name"].replace("'", "''")
         isMovieExists = database.select_all_from(
-            table="posts", condition=f"post_title='{movie_details['name']}'"
+            table="posts", condition=f"post_title='{movie_name}'"
         )
         if isMovieExists:
             return
