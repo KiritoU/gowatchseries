@@ -60,7 +60,6 @@ class Crawler:
                 }
 
                 movie_details = {**movie_details, **self.get_movie_details(href)}
-                print(movie_details)
                 helper.insert_movie(movie_details)
 
         except Exception as e:

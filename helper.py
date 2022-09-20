@@ -170,7 +170,6 @@ class Helper:
         return thumbId
 
     def insert_movie(self, movie_details: dict, post_type: str = "post"):
-        print(movie_details)
         movie_name = movie_details["name"].replace("'", "''")
         isMovieExists = database.select_all_from(
             table="posts", condition=f"post_title='{movie_name}'"
@@ -220,38 +219,24 @@ class Helper:
             (postId, "_video_link", "field_601d685ea50eb"),
             (postId, "chat_luong_video", movie_details["season"]),
             (postId, "_chat_luong_video", "field_5ff2f401eac3f"),
-            (postId, "country", ""),
+            (postId, "country", movie_details["country"]),
             (postId, "_country", "field_60187b7c9c230"),
-            (postId, "released", ""),
+            (postId, "released", movie_details["released"]),
             (postId, "_released", "field_62e7989914215"),
             (postId, "trailer", ""),
             (postId, "_trailer", "field_62e798d4938b0"),
-            (postId, "genre", ""),
+            (postId, "genre", movie_details["genre"]),
             (postId, "_genre", "field_62eb4674d417d"),
             (postId, "film_type", ""),
             (postId, "_film_type", "field_630ecf331b56c"),
             (postId, "_", "field_630ecf4b1b56d"),
             (postId, "post_views_count", "0"),
-            (postId, "_genre", "field_62eb4674d417d"),
-            (postId, "_country", "field_60187b7c9c230"),
-            (postId, "_released", "field_62e7989914215"),
         ]
-
-        print((postId, "genre", movie_details["genre"]))
-        postmetas.append((postId, "genre", movie_details["genre"]))
-        print((postId, "genre", movie_details["country"]))
-        postmetas.append((postId, "country", movie_details["country"]))
-        print((postId, "genre", movie_details["released"]))
-        postmetas.append((postId, "released", movie_details["released"]))
-
-        print(postmetas)
         for pmeta in postmetas:
-            print(f"Inserting postmeta: {pmeta}")
             database.insert_into(
                 table="postmeta",
                 data=pmeta,
             )
-            sleep(2)
 
         database.insert_into(table="term_relationships", data=(postId, 13853, 0))
 
