@@ -43,6 +43,77 @@ class Helper:
 
         return timeupdate
 
+    def get_description_from(self, detail: BeautifulSoup) -> str:
+        try:
+            description = detail.find("div", class_="des").text
+            return description
+        except Exception as e:
+            self.error_log(
+                f"Failed to get description from{detail}\n{e}",
+                log_file="get_description.log",
+            )
+            return ""
+
+    def get_links_from(self, detail: BeautifulSoup) -> str:
+        res = []
+
+        try:
+            anime_muti_link = detail.find("div", class_="anime_muti_link")
+
+            links = anime_muti_link.find_all("li")
+            for link in links:
+                data_video = link.get("data-video")
+                res.append(data_video)
+        except Exception as e:
+            self.error_log(
+                msg=f"Failed to get links from {detail}\n{e}",
+                log_file="get_links.log",
+            )
+
+        return res
+
+    def get_info_value(self, item: BeautifulSoup) -> str:
+        res = []
+        try:
+            for a in item.find_all("a"):
+                res.append(a.get("title"))
+        except Exception as e:
+            self.error_log(f"Failed to get info value\n{item}\n{e}")
+
+        return ", ".join(res)
+
+    def get_info_movies(self, detail: BeautifulSoup) -> dict:
+        res = {
+            "genre": "",
+            "country": "",
+            "released": "",
+        }
+
+        try:
+            info_movies = detail.find("div", {"id": "info_movies"})
+
+            right = info_movies.find("div", class_="right")
+            li_items = right.find_all("li")
+            for item in li_items:
+                key = item.find("span").text
+                if "release" in key.lower():
+                    value = self.format_text(
+                        item.text.replace(key, "").replace('"', "")
+                    )
+                else:
+                    value = self.get_info_value(item)
+
+                key = CONFIG.POSTMETA_MAPPING[key.replace(":", "").strip()]
+                res[key] = value
+
+        except Exception as e:
+            self.error_log(
+                f"Failed to get info_movies {detail}\n{e}",
+                log_file="get_info_movies.log",
+            )
+
+        return res
+
     def save_thumb(
         self,
         imageUrl: str,
@@ -159,6 +230,12 @@ class Helper:
             (postId, "_film_type", "field_630ecf331b56c"),
             (postId, "_", "field_630ecf4b1b56d"),
             (postId, "post_views_count", "0"),
+            (postId, "genre", movie_details["genre"]),
+            (postId, "_genre", "field_62eb4674d417d"),
+            (postId, "country", movie_details["country"]),
+            (postId, "_country", "field_60187b7c9c230"),
+            (postId, "released", movie_details["released"]),
+            (postId, "_released", "field_62e7989914215"),
         ]
 
         for pmeta in postmetas:

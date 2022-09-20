@@ -27,27 +27,15 @@ class Crawler:
         if soup == 404:
             return {}
 
-        try:
-            detail = soup.find("div", class_="detail")
-
-            des = detail.find("div", class_="des").text
-
-            res = {"description": des, "links": []}
-
-            anime_muti_link = detail.find("div", class_="anime_muti_link")
-
-            links = anime_muti_link.find_all("li")
-            for link in links:
-                data_video = link.get("data-video")
-                res["links"].append(data_video)
-
-            return res
-        except Exception as e:
-            helper.error_log(
-                msg=f"Failed to get movie_details\n{href}\n{e}",
-                log_file="movie_details.log",
-            )
+        detail = soup.find("div", class_="detail")
+        if not detail:
             return {}
+
+        return {
+            "description": helper.get_description_from(detail),
+            "links": helper.get_links_from(detail),
+            **helper.get_info_movies(detail),
+        }
 
     def crawl_movies_on_page_with(self, soup: BeautifulSoup) -> dict:
         items = soup.find("ul", class_="listing items")
