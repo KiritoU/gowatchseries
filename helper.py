@@ -1,3 +1,4 @@
+from time import sleep
 import requests
 
 
@@ -239,10 +240,12 @@ class Helper:
         ]
 
         for pmeta in postmetas:
+            print(f"Inserting postmeta: {pmeta}")
             database.insert_into(
                 table="postmeta",
                 data=pmeta,
             )
+            sleep(2)
 
         database.insert_into(table="term_relationships", data=(postId, 13853, 0))
 
