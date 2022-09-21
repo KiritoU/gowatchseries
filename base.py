@@ -34,7 +34,7 @@ class Crawler:
         return {
             "description": helper.get_description_from(detail),
             "links": helper.get_links_from(detail),
-            **helper.get_info_movies(detail),
+            **helper.get_info_movies(soup),
         }
 
     def crawl_movies_on_page_with(self, soup: BeautifulSoup) -> dict:

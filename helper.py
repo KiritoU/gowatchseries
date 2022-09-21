@@ -83,14 +83,29 @@ class Helper:
 
         return ", ".join(res)
 
-    def get_info_movies(self, detail: BeautifulSoup) -> dict:
-        res = {
-            "genre": "",
-            "country": "",
-            "released": "",
-        }
+    def get_trailer_src(self, soup: BeautifulSoup) -> str:
+        res = ""
+
+        scripts = soup.find_all("script")
+        for script in scripts:
+            if "iframe-trailer" in str(script):
+                lines = str(script).split(";")
+                for line in lines:
+                    if "iframe-trailer" in line:
+                        line_splitted = line.split('"')
+                        for splitted in line_splitted:
+                            if "http" in splitted:
+                                res = splitted
+        return res
+
+    def get_info_movies(self, soup: BeautifulSoup) -> dict:
+        detail = soup.find("div", class_="detail")
+
+        res = {"genre": "", "country": "", "released": "", "trailer": ""}
 
         try:
+            res["trailer"] = self.get_trailer_src(soup)
+
             info_movies = detail.find("div", {"id": "info_movies"})
 
             right = info_movies.find("div", class_="right")
@@ -223,7 +238,7 @@ class Helper:
             (postId, "_country", "field_60187b7c9c230"),
             (postId, "released", movie_details["released"]),
             (postId, "_released", "field_62e7989914215"),
-            (postId, "trailer", ""),
+            (postId, "trailer", movie_details["trailer"]),
             (postId, "_trailer", "field_62e798d4938b0"),
             (postId, "genre", movie_details["genre"]),
             (postId, "_genre", "field_62eb4674d417d"),
@@ -232,6 +247,14 @@ class Helper:
             (postId, "_", "field_630ecf4b1b56d"),
             (postId, "post_views_count", "0"),
         ]
+        for i in range(1, len(movie_details["links"])):
+            postmetas.append(
+                (
+                    postId,
+                    f"video_link_{i}",
+                    movie_details["links"][i],
+                )
+            )
         for pmeta in postmetas:
             database.insert_into(
                 table="postmeta",
