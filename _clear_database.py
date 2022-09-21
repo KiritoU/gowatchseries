@@ -18,8 +18,10 @@ def delete_saved_thumbs():
 def main():
     delete_saved_thumbs()
 
-    query = "SELECT p.ID FROM `ODJiM2_term_relationships` tr, ODJiM2_posts p WHERE p.ID=tr.object_id AND p.post_type='post' AND tr.term_taxonomy_id=13853"
-    post_ids = database.select_with(query)
+    # query = "SELECT p.ID FROM `ODJiM2_term_relationships` tr, ODJiM2_posts p WHERE p.ID=tr.object_id AND p.post_type='post' AND tr.term_taxonomy_id=13853"
+    post_ids = database.select_all_from(
+        table="posts", condition="post_type='post' OR post_type='chap'"
+    )
     post_ids = [x[0] for x in post_ids]
 
     for post_id in post_ids:

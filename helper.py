@@ -265,5 +265,161 @@ class Helper:
 
         return postId
 
+    def insert_root_serie(self, serie_details: dict) -> int:
+        serie_name = serie_details["title"].replace("'", "''")
+        backendSerie = database.select_all_from(
+            table="posts", condition=f"post_title='{serie_name}'", cols="ID"
+        )
+        if backendSerie:
+            postId = backendSerie[0][0]
+            thumbId = database.select_all_from(
+                table="postmeta",
+                condition=f"post_id={postId} AND meta_key='_thumbnail_id'",
+                cols="meta_value",
+            )[0][0]
+            return [postId, thumbId]
+
+        thumbId = self.insert_thumb(serie_details["picture"])
+        timeupdate = self.get_timeupdate()
+        data = (
+            0,
+            timeupdate,
+            timeupdate,
+            serie_details["description"],
+            serie_details["title"],
+            "",
+            "publish",
+            "open",
+            "closed",
+            "",
+            slugify(serie_details["title"]),
+            "",
+            "",
+            timeupdate,
+            timeupdate,
+            "",
+            0,
+            "",
+            0,
+            "post",
+            "",
+            0,
+        )
+
+        postId = database.insert_into(table=f"posts", data=data)
+
+        postmetas = [
+            (postId, "_thumbnail_id", thumbId),
+            (postId, "show_tien_to", "0"),
+            (postId, "show_trangthai", "0"),
+            (postId, "tw_multi_chap", "1"),
+            (postId, "chat_luong_video", "HD"),
+            (postId, "country", serie_details["country"]),
+            (postId, "released", serie_details["released"]),
+            (postId, "trailer", serie_details["trailer"]),
+            (postId, "genre", serie_details["genre"]),
+            (postId, "tw_parent", postId),
+            (postId, "film_type", "TV SHOW"),
+            (postId, "post_views_count", "0"),
+        ]
+        for pmeta in postmetas:
+            database.insert_into(
+                table="postmeta",
+                data=pmeta,
+            )
+
+        database.insert_into(table="term_relationships", data=(postId, 1, 0))
+
+        return [postId, thumbId]
+
+    def insert_serie_episode(self, episode: dict, serieId: int, thumbId: int):
+        serieEpisodeName = episode["title"].replace("'", "''")
+        backendSerieEpisode = database.select_all_from(
+            table="posts", condition=f"post_title='{serieEpisodeName}'"
+        )
+        if backendSerieEpisode:
+            return
+
+        timeupdate = self.get_timeupdate()
+        data = (
+            0,
+            timeupdate,
+            timeupdate,
+            episode["description"],
+            episode["title"],
+            "",
+            "publish",
+            "open",
+            "closed",
+            "",
+            slugify(episode["title"]),
+            "",
+            "",
+            timeupdate,
+            timeupdate,
+            "",
+            serieId,
+            "",
+            0,
+            "chap",
+            "",
+            0,
+        )
+
+        postId = database.insert_into(table=f"posts", data=data)
+
+        postmetas = [
+            (postId, "_thumbnail_id", thumbId),
+            (postId, "show_tien_to", "0"),
+            (postId, "show_trangthai", "0"),
+            (postId, "chat_luong_video", "HD"),
+            (
+                postId,
+                "video_link",
+                episode["links"][0],
+            ),
+            (postId, "country", episode["country"]),
+            (postId, "released", episode["released"]),
+            (postId, "trailer", episode["trailer"]),
+            (postId, "genre", episode["genre"]),
+            (postId, "post_views_count", "0"),
+        ]
+
+        for i in range(1, len(episode["links"])):
+            postmetas.append(
+                (
+                    postId,
+                    f"video_link_{i}",
+                    episode["links"][i],
+                )
+            )
+
+        for pmeta in postmetas:
+            database.insert_into(
+                table="postmeta",
+                data=pmeta,
+            )
+
+        database.insert_into(table="term_relationships", data=(postId, 1, 0))
+
+    def insert_serie(self, serie_details: dict):
+        try:
+            serieId, thumbId = self.insert_root_serie(serie_details)
+        except Exception as e:
+            self.error_log(
+                msg=f"Error inserting root serie\n{serie_details}\n{e}",
+                log_file="insert_root_serie.log",
+            )
+            return
+
+        for episode in serie_details["child_episode"]:
+            try:
+                self.insert_serie_episode(episode, serieId, thumbId)
+            except Exception as e:
+                self.error_log(
+                    msg=f"Error inserting serie\n{episode}\n{e}",
+                    log_file="insert_serie_episode.log",
+                )
+
 
 helper = Helper()
