@@ -7,7 +7,7 @@ from settings import CONFIG
 def main():
     crawler = Crawler()
     while True:
-        url = f"{CONFIG.GO_WATCH_SERIES_HOMEPAGE}/list?page=1"
+        url = f"{CONFIG.GO_WATCH_SERIES_HOMEPAGE}/list?type=2&page=1"
         soup = Crawler().crawl_soup(url)
 
         list_movies = soup.find("div", class_="list_movies")
