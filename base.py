@@ -167,6 +167,7 @@ class Crawler:
 
         return res
 
+    # Add because wrong commit :))
     def crawl_new_release_with(self, soup: BeautifulSoup) -> dict:
         items = soup.find("ul", class_="listing items")
         if not items:
