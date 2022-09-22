@@ -92,13 +92,19 @@ class Crawler:
                 detail = soup.find("div", class_="detail")
                 res["title"] = helper.format_text(detail.find("h1").text)
             except Exception as e:
-                helper.error_log(f"get_serie_details: Failed to get title\n{e}")
+                helper.error_log(
+                    f"get_serie_details: Failed to get title\n{e}",
+                    log_file="serie_details_title.log",
+                )
 
             try:
                 picture = soup.find("div", class_="picture").find("img").get("src")
                 res["picture"] = picture
             except Exception as e:
-                helper.error_log(f"get_serie_details: Failed to get picture\n{e}")
+                helper.error_log(
+                    f"get_serie_details: Failed to get picture\n{e}",
+                    log_file="serie_details_picture.log",
+                )
 
             episodes = soup.find_all("li", class_="child_episode")
             for episode in episodes:
@@ -143,4 +149,63 @@ class Crawler:
             helper.error_log(
                 msg=f"Failed to crawl_series_on_page_with_soup\n{str(serie)}\n{e}",
                 log_file="serie_page.log",
+            )
+
+    def get_serie_info_href(self, new_episode_href: str) -> str:
+        res = ""
+
+        url = f"{CONFIG.GO_WATCH_SERIES_HOMEPAGE}{new_episode_href}"
+        soup = self.crawl_soup(url)
+        if soup == 404:
+            return res
+
+        try:
+            detail = soup.find("div", class_="detail")
+            res = detail.find("h1").find("a").get("href")
+        except Exception as e:
+            helper.error_log(f"Failed to get_serie_info_href: {new_episode_href}\n{e}")
+
+        return res
+
+    def crawl_new_release_with(self, soup: BeautifulSoup) -> dict:
+        items = soup.find("ul", class_="listing items")
+        if not items:
+            return
+
+        items = items.find_all("li")
+
+        try:
+            for item in items:
+                a_element = item.find("a")
+                href = a_element.get("href")
+                picture = a_element.find("div", class_="picture").find("img").get("src")
+                name = helper.format_text(a_element.find("div", class_="name").text)
+                season = helper.format_text(a_element.find("div", class_="season").text)
+
+                item_details = {
+                    "href": href,
+                    "name": name,
+                    "season": season,
+                    "picture": picture,
+                }
+
+                if "episode" in item_details["season"].lower():
+                    new_episode_href = self.get_serie_info_href(item_details["href"])
+
+                    try:
+                        serie_details = self.get_serie_details(new_episode_href)
+                        helper.insert_serie(serie_details)
+                    except Exception as e:
+                        helper.error_log(
+                            msg=f"Failed to crawl serie from new release: {new_episode_href}",
+                            log_file="serie_from_new_release.log",
+                        )
+                else:
+                    item_details = {**item_details, **self.get_movie_details(href)}
+                    helper.insert_movie(item_details)
+
+        except Exception as e:
+            helper.error_log(
+                msg=f"Failed to crawl_movies_on_page_with_soup\n{str(item)}\n{e}",
+                log_file="movie_page.log",
             )

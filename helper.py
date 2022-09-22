@@ -79,7 +79,10 @@ class Helper:
             for a in item.find_all("a"):
                 res.append(a.get("title"))
         except Exception as e:
-            self.error_log(f"Failed to get info value\n{item}\n{e}")
+            self.error_log(
+                f"Failed to get info value\n{item}\n{e}",
+                log_file="helper_get_info_value.log",
+            )
 
         return ", ".join(res)
 
