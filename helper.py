@@ -36,7 +36,7 @@ class Helper:
         return requests.get(url, headers=self.get_header())
 
     def format_text(self, text: str) -> str:
-        return text.strip().strip("\n")
+        return text.strip().strip("\n").replace("\\", "")
 
     def get_timeupdate(self) -> str:
         # TODO: later
@@ -149,6 +149,9 @@ class Helper:
 
     def insert_thumb(self, thumbUrl: str) -> int:
         thumbName = thumbUrl.split("/")[-1]
+        if not thumbName:
+            return 0
+
         self.save_thumb(thumbUrl, thumbName)
         timeupdate = self.get_timeupdate()
         thumbPostData = (
@@ -221,7 +224,6 @@ class Helper:
         postId = database.insert_into(table=f"posts", data=data)
 
         postmetas = [
-            (postId, "_thumbnail_id", thumbId),
             (postId, "tw_multi_chap", "0"),
             (postId, "tw_status", "Đang cập nhật"),
             (postId, "post_question_1", ""),
@@ -247,6 +249,8 @@ class Helper:
             (postId, "_", "field_630ecf4b1b56d"),
             (postId, "post_views_count", "0"),
         ]
+        if thumbId:
+            postmetas.append((postId, "_thumbnail_id", thumbId))
         for i in range(1, len(movie_details["links"])):
             postmetas.append(
                 (
@@ -271,13 +275,23 @@ class Helper:
             table="posts", condition=f"post_title='{serie_name}'", cols="ID"
         )
         if backendSerie:
-            postId = backendSerie[0][0]
-            thumbId = database.select_all_from(
-                table="postmeta",
-                condition=f"post_id={postId} AND meta_key='_thumbnail_id'",
-                cols="meta_value",
-            )[0][0]
-            return [postId, thumbId]
+            try:
+                postId = backendSerie[0][0]
+                thumb = database.select_all_from(
+                    table="postmeta",
+                    condition=f"post_id={postId} AND meta_key='_thumbnail_id'",
+                    cols="meta_value",
+                )
+                thumbId = 0
+                if thumb and thumb[0] and thumb[0][0]:
+                    thumbId = thumb[0][0]
+                return [postId, thumbId]
+            except Exception as e:
+                self.error_log(
+                    f"Serie: {serie_name} - Something went wrong!!!\n{e}",
+                    log_file="exitst_post_and_postmeta.log",
+                )
+                return [0, 0]
 
         thumbId = self.insert_thumb(serie_details["picture"])
         timeupdate = self.get_timeupdate()
@@ -309,7 +323,6 @@ class Helper:
         postId = database.insert_into(table=f"posts", data=data)
 
         postmetas = [
-            (postId, "_thumbnail_id", thumbId),
             (postId, "show_tien_to", "0"),
             (postId, "show_trangthai", "0"),
             (postId, "tw_multi_chap", "1"),
@@ -322,6 +335,8 @@ class Helper:
             (postId, "film_type", "TV SHOW"),
             (postId, "post_views_count", "0"),
         ]
+        if thumbId:
+            postmetas.append((postId, "_thumbnail_id", thumbId))
         for pmeta in postmetas:
             database.insert_into(
                 table="postmeta",
@@ -369,7 +384,6 @@ class Helper:
         postId = database.insert_into(table=f"posts", data=data)
 
         postmetas = [
-            (postId, "_thumbnail_id", thumbId),
             (postId, "show_tien_to", "0"),
             (postId, "show_trangthai", "0"),
             (postId, "chat_luong_video", "HD"),
@@ -384,6 +398,9 @@ class Helper:
             (postId, "genre", episode["genre"]),
             (postId, "post_views_count", "0"),
         ]
+
+        if thumbId:
+            postmetas.append((postId, "_thumbnail_id", thumbId))
 
         for i in range(1, len(episode["links"])):
             postmetas.append(

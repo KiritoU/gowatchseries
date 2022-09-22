@@ -88,25 +88,38 @@ class Crawler:
             return res
 
         try:
-            detail = soup.find("div", class_="detail")
-            res["title"] = helper.format_text(detail.find("h1").text)
-            picture = soup.find("div", class_="picture").find("img").get("src")
-            res["picture"] = picture
+            try:
+                detail = soup.find("div", class_="detail")
+                res["title"] = helper.format_text(detail.find("h1").text)
+            except Exception as e:
+                helper.error_log(f"get_serie_details: Failed to get title\n{e}")
+
+            try:
+                picture = soup.find("div", class_="picture").find("img").get("src")
+                res["picture"] = picture
+            except Exception as e:
+                helper.error_log(f"get_serie_details: Failed to get picture\n{e}")
 
             episodes = soup.find_all("li", class_="child_episode")
             for episode in episodes:
                 episode_href = episode.find("a").get("href")
-                episode_title = episode.find("a").get("title")
+                episode_title = helper.format_text(episode.find("a").get("title"))
                 res["child_episode"].append(
                     self.get_movie_details(episode_href, episode_title)
                 )
 
-            first_child = res["child_episode"][0]
-            res["description"] = first_child["description"]
-            res["genre"] = first_child["genre"]
-            res["country"] = first_child["country"]
-            res["released"] = first_child["released"]
-            res["trailer"] = first_child["trailer"]
+            if res["child_episode"] and res["child_episode"][0]:
+                first_child = res["child_episode"][0]
+                res["description"] = first_child["description"]
+                res["genre"] = first_child["genre"]
+                res["country"] = first_child["country"]
+                res["released"] = first_child["released"]
+                res["trailer"] = first_child["trailer"]
+            else:
+                helper.error_log(
+                    msg=f"Serie: {res['title']} has no child episode.\n{href}\n{e}",
+                    log_file="no_child_episode.log",
+                )
 
         except Exception as e:
             helper.error_log(
