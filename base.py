@@ -123,7 +123,7 @@ class Crawler:
                 res["trailer"] = first_child["trailer"]
             else:
                 helper.error_log(
-                    msg=f"Serie: {res['title']} has no child episode.\n{href}\n{e}",
+                    msg=f"Serie: {res['title']} has no child episode.\n{href}",
                     log_file="no_child_episode.log",
                 )
 
