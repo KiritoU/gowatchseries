@@ -21,7 +21,7 @@ def main():
             i = 1
         else:
             crawler.crawl_movies_on_page_with(soup)
-            sleep(CONFIG.WAIT_BETWEEN_LATEST)
+            sleep(CONFIG.WAIT_BETWEEN_ALL)
 
             i += 1
 

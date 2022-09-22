@@ -10,21 +10,15 @@ logging.basicConfig(format="%(asctime)s %(levelname)s:%(message)s", level=loggin
 
 def main():
     crawler = Crawler()
-    i = 1
     while True:
-        url = f"{CONFIG.GO_WATCH_SERIES_HOMEPAGE}/list?type=2&page={i}"
+        url = f"{CONFIG.GO_WATCH_SERIES_HOMEPAGE}/new-release"
         logging.info(f"Getting URL: {url}")
 
         soup = Crawler().crawl_soup(url)
 
-        list_movies = soup.find("div", class_="list_movies")
-
-        if not list_movies:
-            i = 1
-        else:
-            crawler.crawl_series_on_page_with(list_movies)
-            sleep(CONFIG.WAIT_BETWEEN_ALL)
-            i += 1
+        if soup != 404:
+            crawler.crawl_new_release_with(soup)
+            sleep(CONFIG.WAIT_BETWEEN_LATEST)
 
 
 if __name__ == "__main__":
