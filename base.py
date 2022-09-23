@@ -79,6 +79,7 @@ class Crawler:
             "released": "",
             "trailer": "",
             "picture": "",
+            "links": [],
             "child_episode": [],
         }
 
@@ -109,10 +110,12 @@ class Crawler:
             episodes = soup.find_all("li", class_="child_episode")
             for episode in episodes:
                 episode_href = episode.find("a").get("href")
+
                 episode_title = helper.format_text(episode.find("a").get("title"))
-                res["child_episode"].append(
-                    self.get_movie_details(episode_href, episode_title)
-                )
+                if "javascript" not in episode_href:
+                    res["child_episode"].append(
+                        self.get_movie_details(episode_href, episode_title)
+                    )
 
             if res["child_episode"] and res["child_episode"][0]:
                 first_child = res["child_episode"][0]
