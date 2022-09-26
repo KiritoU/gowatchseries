@@ -150,10 +150,12 @@ class Helper:
 
         return [saveImage, isNotSaved]
 
-    def insert_thumb(self, thumbUrl: str) -> int:
-        thumbName = thumbUrl.split("/")[-1]
-        if not thumbName:
+    def insert_thumb(self, post_name: str, thumbUrl: str) -> int:
+        thumbExtension = thumbUrl.split(".")[-1]
+        if not thumbExtension:
             return 0
+
+        thumbName = f"{post_name}.{thumbExtension}"
 
         self.save_thumb(thumbUrl, thumbName)
         timeupdate = self.get_timeupdate()
@@ -198,7 +200,7 @@ class Helper:
         if isMovieExists:
             return
 
-        thumbId = self.insert_thumb(movie_details["picture"])
+        thumbId = self.insert_thumb(movie_details["name"], movie_details["picture"])
         timeupdate = self.get_timeupdate()
         data = (
             0,
@@ -296,7 +298,9 @@ class Helper:
                 )
                 return [0, 0]
 
-        thumbId = self.insert_thumb(serie_details["picture"])
+        thumbId = self.insert_thumb(
+            slugify(serie_details["title"]), serie_details["picture"]
+        )
         timeupdate = self.get_timeupdate()
         data = (
             0,
