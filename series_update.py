@@ -15,16 +15,21 @@ def main():
         url = f"{CONFIG.GO_WATCH_SERIES_HOMEPAGE}/list?type=2&page={i}"
         logging.info(f"Getting URL: {url}")
 
-        soup = Crawler().crawl_soup(url)
+        try:
+            soup = Crawler().crawl_soup(url)
 
-        list_movies = soup.find("div", class_="list_movies")
+            list_movies = soup.find("div", class_="list_movies")
 
-        if not list_movies:
-            i = 1
-        else:
-            crawler.crawl_series_on_page_with(list_movies)
-            sleep(CONFIG.WAIT_BETWEEN_ALL)
-            i += 1
+            if not list_movies:
+                i = 1
+                continue
+            else:
+                crawler.crawl_series_on_page_with(list_movies)
+                sleep(CONFIG.WAIT_BETWEEN_ALL)
+        except Exception as e:
+            pass
+
+        i += 1
 
 
 if __name__ == "__main__":

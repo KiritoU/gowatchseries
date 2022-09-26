@@ -15,15 +15,19 @@ def main():
         url = f"{CONFIG.GO_WATCH_SERIES_HOMEPAGE}/movies?page={i}"
         logging.info(f"Getting URL: {url}")
 
-        soup = Crawler().crawl_soup(url)
+        try:
+            soup = Crawler().crawl_soup(url)
 
-        if soup == 404:
-            i = 1
-        else:
-            crawler.crawl_movies_on_page_with(soup)
-            sleep(CONFIG.WAIT_BETWEEN_ALL)
+            if soup == 404:
+                i = 1
+                continue
+            else:
+                crawler.crawl_movies_on_page_with(soup)
+                sleep(CONFIG.WAIT_BETWEEN_ALL)
+        except Exception as e:
+            pass
 
-            i += 1
+        i += 1
 
 
 if __name__ == "__main__":
