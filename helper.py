@@ -155,7 +155,7 @@ class Helper:
         if not thumbExtension:
             return 0
 
-        thumbName = f"{post_name}.{thumbExtension}"
+        thumbName = f"{slugify(post_name)}.{thumbExtension}"
 
         self.save_thumb(thumbUrl, thumbName)
         timeupdate = self.get_timeupdate()
