@@ -19,8 +19,8 @@ def main():
             soup = Crawler().crawl_soup(url)
 
             list_movies = soup.find("div", class_="list_movies")
-
-            if not list_movies:
+            series = list_movies.find_all("li")
+            if not series:
                 i = 1
                 continue
             else:
