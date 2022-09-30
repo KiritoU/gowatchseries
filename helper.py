@@ -151,7 +151,7 @@ class Helper:
         return [saveImage, isNotSaved]
 
     def insert_thumb(self, post_name: str, thumbUrl: str) -> int:
-        thumbExtension = thumbUrl.split(".")[-1]
+        thumbExtension = thumbUrl.split("/")[-1].split(".")[-1]
         if not thumbExtension:
             return 0
 
