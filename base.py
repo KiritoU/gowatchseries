@@ -67,7 +67,7 @@ class Crawler:
         except Exception as e:
             helper.error_log(
                 msg=f"Failed to crawl_movies_on_page_with_soup\n{str(item)}\n{e}",
-                log_file="movie_page.log",
+                log_file="base.crawl_movies_on_page_with_soup.log",
             )
 
     def get_serie_details(self, href: str) -> dict:
@@ -210,6 +210,6 @@ class Crawler:
 
         except Exception as e:
             helper.error_log(
-                msg=f"Failed to crawl_movies_on_page_with_soup\n{str(item)}\n{e}",
-                log_file="movie_page.log",
+                msg=f"Failed to crawl_new_release_with\n{str(item)}\n{e}",
+                log_file="base.crawl_new_release_with.log",
             )

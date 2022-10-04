@@ -23,9 +23,10 @@ def main():
                 continue
             else:
                 crawler.crawl_movies_on_page_with(soup)
-                sleep(CONFIG.WAIT_BETWEEN_ALL)
         except Exception as e:
             pass
+
+        sleep(CONFIG.WAIT_BETWEEN_ALL)
 
         i += 1
 

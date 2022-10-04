@@ -25,9 +25,10 @@ def main():
                 continue
             else:
                 crawler.crawl_series_on_page_with(list_movies)
-                sleep(CONFIG.WAIT_BETWEEN_ALL)
         except Exception as e:
             pass
+
+        sleep(CONFIG.WAIT_BETWEEN_ALL)
 
         i += 1
 

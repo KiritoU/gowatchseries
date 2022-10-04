@@ -192,6 +192,40 @@ class Helper:
 
         return thumbId
 
+    def insert_taxonomy(self, post_id: int, taxonomies: str, taxonomy_kind: str):
+        taxonomies = taxonomies.split(",")
+        for taxonomy in taxonomies:
+            try:
+                termName = self.format_text(taxonomy)
+                cols = "tt.term_taxonomy_id"
+                table = f"{CONFIG.TABLE_PREFIX}term_taxonomy tt, {CONFIG.TABLE_PREFIX}terms t"
+                condition = f't.name = "{termName}" AND tt.term_id=t.term_id AND tt.taxonomy="{taxonomy_kind}"'
+
+                query = f"SELECT {cols} FROM {table} WHERE {condition}"
+                beTaxonomyId = database.select_with(query)
+
+                if not beTaxonomyId:
+                    taxonomyTermId = database.insert_into(
+                        table="terms",
+                        data=(termName.capitalize(), slugify(taxonomy_kind), 0),
+                    )
+                    taxonomyTermTaxonomyId = database.insert_into(
+                        table="term_taxonomy",
+                        data=(taxonomyTermId, taxonomy_kind, "", 0, 0),
+                    )
+                else:
+                    taxonomyTermTaxonomyId = beTaxonomyId[0][0]
+
+                database.insert_into(
+                    table="term_relationships",
+                    data=(post_id, taxonomyTermTaxonomyId, 0),
+                )
+            except Exception as e:
+                self.error_log(
+                    msg=f"Error inserting taxonomy: {taxonomy}\n{e}",
+                    log_file="helper.insert_taxonomy.log",
+                )
+
     def insert_movie(self, movie_details: dict, post_type: str = "post"):
         movie_name = movie_details["name"].replace("'", "''")
         isMovieExists = database.select_all_from(
@@ -271,6 +305,9 @@ class Helper:
             )
 
         database.insert_into(table="term_relationships", data=(postId, 13853, 0))
+        self.insert_taxonomy(postId, movie_details["country"], "country")
+        self.insert_taxonomy(postId, movie_details["released"], "release")
+        self.insert_taxonomy(postId, movie_details["genre"], "genres")
 
         return postId
 
