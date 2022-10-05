@@ -207,7 +207,7 @@ class Helper:
                 if not beTaxonomyId:
                     taxonomyTermId = database.insert_into(
                         table="terms",
-                        data=(termName.capitalize(), slugify(taxonomy_kind), 0),
+                        data=(termName.capitalize(), slugify(termName), 0),
                     )
                     taxonomyTermTaxonomyId = database.insert_into(
                         table="term_taxonomy",
@@ -388,6 +388,10 @@ class Helper:
             )
 
         database.insert_into(table="term_relationships", data=(postId, 1, 0))
+
+        self.insert_taxonomy(postId, serie_details["country"], "country")
+        self.insert_taxonomy(postId, serie_details["released"], "release")
+        self.insert_taxonomy(postId, serie_details["genre"], "genres")
 
         return [postId, thumbId]
 
