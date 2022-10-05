@@ -466,6 +466,9 @@ class Helper:
             )
 
         database.insert_into(table="term_relationships", data=(postId, 1, 0))
+        self.insert_taxonomy(postId, episode["country"], "country")
+        self.insert_taxonomy(postId, episode["released"], "release")
+        self.insert_taxonomy(postId, episode["genre"], "genres")
 
     def insert_serie(self, serie_details: dict):
         try:
