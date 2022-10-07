@@ -9,6 +9,7 @@ from slugify import slugify
 
 
 from _db import database
+from notifications import Notification
 
 
 from settings import CONFIG
@@ -395,13 +396,28 @@ class Helper:
 
         return [postId, thumbId]
 
+    def check_duplicate_serie(self, serieEpisodeName: str):
+        nameSplitted = serieEpisodeName.split("-")
+        if len(nameSplitted) < 2:
+            return
+
+        checkName = nameSplitted[0].strip() + "%" + nameSplitted[1].strip()
+        backendSerieEpisode = database.select_all_from(
+            table="posts", condition=f"post_title LIKE '{checkName}'"
+        )
+        if backendSerieEpisode:
+            Notification(f"{serieEpisodeName} might be duplicated!").send()
+
     def insert_serie_episode(self, episode: dict, serieId: int, thumbId: int):
         serieEpisodeName = episode["title"].replace("'", "''")
+
         backendSerieEpisode = database.select_all_from(
             table="posts", condition=f"post_title='{serieEpisodeName}'"
         )
         if backendSerieEpisode:
             return
+
+        self.check_duplicate_serie(serieEpisodeName)
 
         timeupdate = self.get_timeupdate()
         data = (
