@@ -408,14 +408,40 @@ class Helper:
         if backendSerieEpisode:
             Notification(f"{serieEpisodeName} might be duplicated!").send()
 
-    def format_episode_title(self, title: str) -> str:
+    def isNotNumber(self, number: str) -> bool:
         try:
-            titleDescription = title.split("Season")[1].strip()
+            float(number)
+            return False
+        except:
+            return True
+
+    def format_episode_title(self, title: str) -> str:
+        titleDescription = title
+        try:
+            if "Season" in titleDescription:
+                titleDescription = " ".join(title.split("Season")[1:]).strip()
             titleDescription = titleDescription.split("Episode")[1].strip()
             titleDescription = titleDescription.split(" ")[1:]
             titleDescription = " ".join(titleDescription)
 
-            return title.replace(titleDescription, "").strip()
+            titleDescription = title.replace(titleDescription, "").strip()
+
+            if titleDescription.count("Season") > 1:
+                res = []
+                titleSplitted = titleDescription.split(" ")
+                for i in range(len(titleSplitted) - 1):
+                    if titleSplitted[i] == "Season" and self.isNotNumber(
+                        str(titleSplitted[i + 1])
+                    ):
+                        continue
+
+                    res.append(titleSplitted[i])
+
+                res.append(titleSplitted[len(titleSplitted) - 1])
+
+                return " ".join(res)
+
+            return titleDescription
 
         except Exception as e:
             self.error_log(
