@@ -408,7 +408,25 @@ class Helper:
         if backendSerieEpisode:
             Notification(f"{serieEpisodeName} might be duplicated!").send()
 
+    def format_episode_title(self, title: str) -> str:
+        try:
+            titleDescription = title.split("Season")[1].strip()
+            titleDescription = titleDescription.split("Episode")[1].strip()
+            titleDescription = titleDescription.split(" ")[1:]
+            titleDescription = " ".join(titleDescription)
+
+            return title.replace(titleDescription, "").strip()
+
+        except Exception as e:
+            self.error_log(
+                msg=f"Error formatting episode title\n{title}\n{e}",
+                log_file="helper.format_episode_title.log",
+            )
+            return title
+
     def insert_serie_episode(self, episode: dict, serieId: int, thumbId: int):
+        episode["title"] = self.format_episode_title(episode["title"])
+
         serieEpisodeName = episode["title"].replace("'", "''")
 
         backendSerieEpisode = database.select_all_from(
@@ -417,7 +435,7 @@ class Helper:
         if backendSerieEpisode:
             return
 
-        self.check_duplicate_serie(serieEpisodeName)
+        # self.check_duplicate_serie(serieEpisodeName)
 
         timeupdate = self.get_timeupdate()
         data = (
