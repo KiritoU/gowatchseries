@@ -59,7 +59,7 @@ def main():
     postTypes = [
         "post",
         "chap",
-        "revision",
+        # "revision",
         # "customize_changeset",
         # "oembed_cache",
         # "acf-field",
