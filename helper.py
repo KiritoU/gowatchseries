@@ -451,7 +451,7 @@ class Helper:
             return title
 
     def insert_serie_episode(self, episode: dict, serieId: int, thumbId: int):
-        episode["title"] = self.format_episode_title(episode["title"])
+        # episode["title"] = self.format_episode_title(episode["title"])
 
         serieEpisodeName = episode["title"].replace("'", "''")
 
